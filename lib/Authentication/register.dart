@@ -1,7 +1,7 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutterapp_udemy_foodpanda/widgets/custom_text_field.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -20,10 +20,27 @@ class _RegisterScreenState extends State<RegisterScreen>
   TextEditingController phoneController = TextEditingController();
   TextEditingController locationController = TextEditingController();
 
+  Position? _position;
+  List<Placemark>? placeMarks;
 
+  getCurrentLocation() async
+  {
+    Position newPosition = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
 
-  XFile? imageXFile;
-  final ImagePicker _picker = ImagePicker();
+    var position = newPosition;
+    placeMarks = await placemarkFromCoordinates(
+      position!.latitude,
+      position!.longitude,
+    );
+
+    Placemark pMark = placeMarks![0];
+
+    String completeAdd = '${pMark.subThoroughfare} ${pMark.thoroughfare}, ${pMark.subLocality} ${pMark.locality}, ${pMark.subAdministrativeArea}, ${pMark.administrativeArea} ${pMark.postalCode}, ${pMark.country}';
+
+    locationController.text = completeAdd;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,18 +49,19 @@ class _RegisterScreenState extends State<RegisterScreen>
         mainAxisSize: MainAxisSize.max,
          children: [
            const SizedBox(height: 10,),
-           InkWell(
+           Container(
+             alignment: Alignment.bottomCenter,
              child: CircleAvatar(
-               radius: MediaQuery.of(context).size.width * 0.20,
-               backgroundColor: Colors.lightBlueAccent,
-               backgroundImage: imageXFile==null ? null : FileImage(File(imageXFile!.path)),
-               child: imageXFile == null
-                   ?
-                 Icon(
-                   Icons.add_photo_alternate,
-                   size: MediaQuery.of(context).size.width * 0.20,
-                   color: Colors.cyanAccent,
-                 ) : null,
+               radius: 80,
+               backgroundColor: Colors.transparent,
+               child: ClipOval(
+                 child: Image.asset(
+                   'images/cafe.jpeg',
+                   fit: BoxFit.cover,
+                   width: 250,
+                   height: 250,
+                 ),
+               ),
              ),
            ),
            const  SizedBox(height: 10,),
@@ -101,7 +119,10 @@ class _RegisterScreenState extends State<RegisterScreen>
                        Icons.location_on,
                        color: Colors.cyanAccent,
                      ),
-                     onPressed: ()=> print("Clicked"),
+                     onPressed: ()
+                     {
+                       getCurrentLocation();
+                     },
                      style: ElevatedButton.styleFrom(
                        backgroundColor: Colors.grey,
                        shape: RoundedRectangleBorder(
@@ -120,7 +141,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold),
              ),
              style: ElevatedButton.styleFrom(
-               backgroundColor: Colors.yellowAccent,
+               backgroundColor: Colors.white,
              ),
              onPressed: ()=> print("clicked"),
            ),

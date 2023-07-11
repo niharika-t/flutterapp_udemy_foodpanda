@@ -47,7 +47,7 @@ class _AuthScreenState extends State<AuthScreen> {
               ),
               Tab(
                 icon: Icon(Icons.person, color: Colors.black,),
-                text: 'Register',
+                text: 'Sign Up',
               ),
             ],
             indicatorColor: Colors.indigo,
